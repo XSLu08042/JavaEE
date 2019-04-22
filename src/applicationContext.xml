@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--原来的.dtd约束配置语法 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"   	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context                     
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+   
+
+<!-- 文件体写在这里 -->
+<bean id="userService" class="service.UserService">
+		<property name="name"><!--注入属性名称，这里用了setter方式调用set方法注入  -->
+				<value>李思思</value>
+		</property>
+</bean>
+<!--setter方式注入  -->
+<bean id="emp" class="entity.Employee">
+		<property name="name" value="张三"></property>
+		<property name="age" value="25"></property>
+		<property name="sex" value="男"></property>		
+		<!-- 将一个bean注入到另外一个bean的属性中使用ref属性 -->		
+		<property name="dept" ref="dept"></property>
+				
+</bean>
+
+<!-- 构造函数方法注入 -->
+<bean id="emp2" class="entity.Employee">
+		<constructor-arg index="0" value="张三"></constructor-arg>
+		<constructor-arg index="1" value="25"></constructor-arg>
+		<constructor-arg index="2" value="男"></constructor-arg>
+</bean>
+
+<!-- 实体 -->
+<bean id="dept" class="entity.Department">
+<property name="deptid" value="001"></property>
+<property name="deptname" value="开发部"></property>
+</bean>
+<bean id="employee" class="entity.Employee">
+		<property name="name" value="张三"></property>
+		<property name="age" value="25"></property>
+		<property name="sex" value="男"></property>		
+		<!-- 将一个bean注入到另外一个bean的属性中使用ref属性 -->		
+		<property name="dept" ref="dept"></property>
+				
+</bean>
+<!-- 注入集合属性 -->
+<bean id="dept1" class="entity.Department">
+<property name="deptid" value="001"></property>
+<property name="deptname" value="开发部"></property>
+<!--  将两个雇员bean注入到部门bean-->
+<property name="employees">
+		<list>
+			<ref bean="employee1"/>
+			<ref bean="employee2"/>
+		</list>
+	</property>
+</bean>
+
+<bean id="employee1" class="entity.Employee">
+	<property name="name" value="张三"></property>
+	<property name="age" value="25"></property>
+	<property name="sex" value="男"></property>
+</bean>
+<bean id="employee2" class="entity.Employee">
+	<property name="name" value="李四"></property>
+	<property name="age" value="24"></property>
+	<property name="sex" value="女"></property>
+</bean>
+
+<!-- 1、将Class类配置到Spring容器中，并初始化两个属性（classno:001，classname:金融班） -->
+<bean id="class1" class="entity.Class">
+<property name="classno" value="001"></property>
+<property name="classname" value="金融班"></property>
+<!--  将两个学生bean注入到部门bean-->
+<property name="students">
+		<list>
+			<ref bean="student1"/>
+			<ref bean="student2"/>
+		</list>
+	</property>
+</bean>
+<!-- 2、初始化该班级students属性，向集合中加入两个学生（张三：25：男，李四：24：女） -->
+<bean id="student1" class="entity.Student">
+	<property name="name" value="张三"></property>
+	<property name="age" value="25"></property>
+	<property name="sex" value="男"></property>
+</bean>
+<bean id="student2" class="entity.Student">
+	<property name="name" value="李四"></property>
+	<property name="age" value="24"></property>
+	<property name="sex" value="女"></property>
+</bean>
+
+<!-- 转换大小写 -->
+<bean id="changeLetter" class="util.UpperLetter"></bean>
+<bean id="changeLetter2" class="util.LowerLetter"></bean>
+
+<!--  将StudentService 配置到Spring中，配置如下:-->
+<!-- <bean class="dao.StudentMysqlDao" id="studentDao">
+</bean>
+<bean class="service.StudentService" id="studentService">
+	<property name="dao" ref="studentDao">
+	</property>
+</bean> -->
+
+<!--扫描dao包 -->
+	<context:component-scan base-package="dao"></context:component-scan>
+<!--扫描service包 -->
+	<context:component-scan base-package="service"></context:component-scan>
+
+<!-- 在spring配置文件中配置bean -->
+<bean id="cat" class="entity.Cat"></bean>
+<bean id="mouse" class="entity.Mouse"></bean> 
+
+<!--配置切面  xml方式配置(非侵入式)-->
+<!-- 定义通知 -->
+<!-- 	<bean id="log" class="util.Log" />
+	<aop:config> -->
+		<!-- 定义切点 这里的*表示可以匹配任何返回值，(..)表示匹配任意参数-->
+		<!-- <aop:pointcut expression="execution(* entity.Cat.catchMouse(..))"
+			id="pointcut" /> -->
+		<!-- 定义切面 -->
+	<!-- 	<aop:aspect ref="log"> -->
+			<!-- 前置通知aop:after，后置通知aop:before -->
+		<!-- 	<aop:after pointcut-ref="pointcut" method="writeLog" />
+		</aop:aspect>
+	</aop:config> -->
+
+
+<!-- 开启aop注解方式(侵入式) -->
+<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+<!-- 将切面类即Log类作为一个bean，配置到Spring中，
+这样Spring在加载的时候才会创建这个切面 -->
+<bean class="util.Log" id="log"></bean>
+
+</beans>
